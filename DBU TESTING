@@ -1,0 +1,51 @@
+-- GUI setup
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("Dragon Blox Ultimate - Advanced", "Midnight")
+
+local Player = game.Players.LocalPlayer
+local AutoFarm = false
+local AutoRebirth = false
+
+-- Tabs and Sections
+local MainTab = Window:NewTab("Main")
+local MainSection = MainTab:NewSection("Automation")
+
+-- Auto Farm Toggle
+MainSection:NewToggle("Auto Farm", "Farms the nearest enemy", function(state)
+    AutoFarm = state
+    if state then
+        task.spawn(function()
+            while AutoFarm do
+                pcall(function()
+                    -- You can change this to target specific NPCs
+                    for _, enemy in pairs(game:GetService("Workspace").NPCs:GetChildren()) do
+                        if enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
+                            Player.Character.HumanoidRootPart.CFrame = enemy.HumanoidRootPart.CFrame + Vector3.new(0, 5, 0)
+                            game:GetService("ReplicatedStorage").Remotes.Damage:FireServer(enemy, math.huge)
+                        end
+                    end
+                end)
+                task.wait(0.5)
+            end
+        end)
+    end
+end)
+
+-- Auto Rebirth Toggle
+MainSection:NewToggle("Auto Rebirth", "Automatically rebirths at required power level", function(state)
+    AutoRebirth = state
+    if state then
+        task.spawn(function()
+            while AutoRebirth do
+                pcall(function()
+                    game:GetService("ReplicatedStorage").Remotes.Rebirth:InvokeServer()
+                end)
+                task.wait(5)
+            end
+        end)
+    end
+end)
+
+-- Credits
+local Credits = Window:NewTab("Credits")
+Credits:NewSection("Script by You!")
